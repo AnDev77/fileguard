@@ -1,0 +1,33 @@
+# Build output
+target/
+frontend/dist/
+
+# Dependencies and package-manager caches
+frontend/node_modules/
+frontend/.npm-cache/
+frontend/.pnpm-store/
+frontend/.pnpm-home/
+
+# Local runtime data
+uploads/
+mysql-data/
+work/
+outputs/
+.docker-config/
+
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# IDE and Codex workspace files
+.idea/
+.vscode/
+.codex/
+.agents/
+*.iml
+
+# Logs and OS metadata
+*.log
+.DS_Store
+Thumbs.db

@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: fileguard
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/fileguard?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Seoul}
+    username: ${SPRING_DATASOURCE_USERNAME:fileguard}
+    password: ${SPRING_DATASOURCE_PASSWORD:fileguard}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 20MB
+
+file:
+  storage-dir: ${FILE_STORAGE_DIR:uploads}
+
+server:
+  error:
+    include-message: never
