@@ -5,6 +5,8 @@
 .codex
 .agents
 .docker-config
+.env
+.env.*
 target
 uploads
 mysql-data

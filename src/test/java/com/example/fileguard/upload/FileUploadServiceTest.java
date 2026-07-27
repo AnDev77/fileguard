@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -16,6 +17,10 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -89,6 +94,35 @@ class FileUploadServiceTest {
         assertThatThrownBy(() -> service.getDownload(3L))
                 .isInstanceOfSatisfying(BusinessException.class, exception ->
                         assertThat(exception.errorCode()).isEqualTo(ErrorCode.FILE_NOT_FOUND));
+    }
+
+    @Test
+    void rejectsFileWithoutExtensionBeforeStorageAndRecordsFailure() throws Exception {
+        MockMultipartFile file = new MockMultipartFile(
+                "file",
+                "README",
+                "text/plain",
+                "content".getBytes()
+        );
+        when(uploadedFileRepository.save(any(UploadedFile.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        FileUploadService service = createService();
+
+        assertThatThrownBy(() -> service.upload(file))
+                .isInstanceOfSatisfying(BusinessException.class, exception -> {
+                    assertThat(exception.errorCode()).isEqualTo(ErrorCode.FILE_EXTENSION_REQUIRED);
+                    assertThat(exception.getMessage()).contains("cannot be evaluated");
+                });
+        verify(uploadedFileRepository).save(argThat(record ->
+                record.getStatus() == UploadStatus.REJECTED
+                        && record.getExtension() == null
+                        && record.getRejectReason().contains("cannot be evaluated")
+        ));
+        verifyNoInteractions(extensionPolicyService);
+        try (var files = Files.list(storageDir)) {
+            assertThat(files).isEmpty();
+        }
     }
 
     private FileUploadService createService() {

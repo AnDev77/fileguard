@@ -21,5 +21,7 @@ file:
   storage-dir: ${FILE_STORAGE_DIR:uploads}
 
 server:
+  address: 0.0.0.0
+  port: ${PORT:8080}
   error:
     include-message: never

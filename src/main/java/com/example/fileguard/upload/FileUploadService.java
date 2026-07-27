@@ -52,7 +52,7 @@ public class FileUploadService {
                     originalFilename,
                     null,
                     file,
-                    "File extension is required."
+                    "Files without an extension are rejected because their type cannot be evaluated by the extension policy."
             );
         }
 
